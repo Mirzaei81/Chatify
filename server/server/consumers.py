@@ -9,7 +9,7 @@ class ChatConsumer(WebsocketConsumer):
     def connect(self):
         self.accept()
 
-    def disconnect(self):
+    def disconnect(self,req):
         self.close()
     def receive(self, text_data:Optional[str]=None, bytes_data=None):
         text_data_json= {}

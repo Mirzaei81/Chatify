@@ -46,7 +46,7 @@ CHANNEL_LAYERS = {
      "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("localhost", 6379)],
+            "hosts": [("redis://default:52d66b702ab048e68a445b927f468783@brief-skylark-37580.upstash.io:37580")],
             "channel_capacity": {
                 "http.request": 200,
                 "http.response!*": 10,
@@ -119,7 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 #ASGI_Applcation
-ASGI_APPLICATION = 'Chatify.routing.application'
+ASGI_APPLICATION = 'Chatify.asgi.application'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
