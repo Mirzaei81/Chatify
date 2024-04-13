@@ -11,11 +11,13 @@ class ChatConsumer(WebsocketConsumer):
 
     def disconnect(self,req):
         self.close()
+
     def receive(self, text_data:Optional[str]=None, bytes_data=None):
         text_data_json= {}
         if text_data:
             text_data_json = json.loads(text_data)
         message = text_data_json["message"]
-        self.send(text_data=json.dumps({"message":message}))
+        user = text_data_json["user"]
+        self.send(text_data=json.dumps({"message":message,"user":user}))
 
 

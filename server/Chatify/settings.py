@@ -23,13 +23,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-0loc6=8j#7*hga)ks2#h=^eqwaw7a%cvv=%uk-8*ev=kz%0d^b'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True 
+
 
 ALLOWED_HOSTS = []
 
-
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    )
+}
 # Application definition
-
 INSTALLED_APPS = [
     "daphne",
     'django.contrib.admin',
@@ -41,12 +45,17 @@ INSTALLED_APPS = [
     "rest_framework",
     "channels",
     "server",
+    "rest_framework.authtoken",
+    "dj_rest_auth",
+    "rest_framework_simplejwt"
 ]
+
+    
 CHANNEL_LAYERS = {
      "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("redis://default:52d66b702ab048e68a445b927f468783@brief-skylark-37580.upstash.io:37580")],
+            "hosts": [("127.0.0.1", 6379)],
             "channel_capacity": {
                 "http.request": 200,
                 "http.response!*": 10,
@@ -66,6 +75,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'Chatify.urls'
 
+REST_AUTH = {
+    'USE_JWT': True,
+}
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
