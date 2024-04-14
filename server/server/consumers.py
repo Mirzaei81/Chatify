@@ -1,23 +1,31 @@
 import json
+from channels import Group
 from typing import Optional
-from channels.generic.websocket import WebsocketConsumer
+from channels.sessions import channel_session
+from urllib.parse import parse_qs
 
-class ChatConsumer(WebsocketConsumer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+@channel_session
+def ws_connect(message, room_name):
+    # Accept connection
+    message.reply_channel.send({"accept": True})
+    # Parse the query string
+    params = parse_qs(message.content["query_string"])
+    if b"username" in params:
+        # Set the username in the session
+        message.channel_session["username"] = params[b"username"][0].decode("utf8")
+        # Add the user to the room_name group
+        Group("chat-%s" % room_name).add(message.reply_channel)
+    else:
+        # Close the connection.
+        message.reply_channel.send({"close": True})
+@channel_session
+def ws_message(message,room_name):
+    Group("chat-%s" % room_name).send( { 
+        "text":json.dumps({
+                                                               "text":message["text"]
+                                                           }) "username": }
+    )
 
-    def connect(self):
-        self.accept()
 
-    def disconnect(self,req):
-        self.close()
-
-    def receive(self, text_data:Optional[str]=None, bytes_data=None):
-        text_data_json= {}
-        if text_data:
-            text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
-        user = text_data_json["user"]
-        self.send(text_data=json.dumps({"message":message,"user":user}))
 
 
