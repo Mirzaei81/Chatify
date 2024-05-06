@@ -32,16 +32,19 @@ export default function MenuItem(Room: { name: string, icon: string | undefined}
     >
       <div className="w-full h-full flex flex-row m-2 justify-around" style={{ borderRadius: "50%" }} >
         {isLoaded ?
-          (<Avatar style={{ borderRadius: "50%" }} >
+          (<>
+          <Avatar style={{ borderRadius: "50%" }} >
             <AvatarImage src={Room.icon}/>
             <AvatarFallback className="text-primary">{Room.name[0].toUpperCase()}{Room.name[1]}</AvatarFallback>
-          </Avatar>)
+          </Avatar>
+            <Link className="text-3xl" to={`/${Room.name}`} style={{ borderRadius: "40" }} >
+              {Room.name}
+            </Link>
+            </>
+          )
           :
           <Skeleton className="rounded-full w-12 h-12" />
         }
-      <Link className="font-Cheveuxdange text-3xl" to={`/${Room.name}`} style={{ borderRadius: "40" }} >
-        {Room.name}
-      </Link>
       </div>
     </motion.li>
   )

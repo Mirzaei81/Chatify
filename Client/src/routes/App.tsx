@@ -58,7 +58,9 @@ function App() {
       <MainNav ShowSide={ShowSide} setShowSide={(e: boolean) => setShowSide(e)} />
       <Routes>
         <Route path="/" element={<Room SideBarShown={ShowSide} />} >
-          <Route path="/:RoomName" element={<Room SideBarShown={ShowSide} />} />
+          <Route path="/:RoomName"
+
+          element={<Room SideBarShown={ShowSide} />} />
         </Route>
       <Route path="*" element={<FourOhFour/>} />
       </Routes>

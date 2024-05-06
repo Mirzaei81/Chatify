@@ -63,7 +63,7 @@ export default function MainNav(Props:IToggleSideBar){
   useEffect(()=>{
     const handleClickOutside=(e:any)=>{
       if(navRef && !navRef.current?.contains(e.target)){
-        setIsLoaded(!isLoaded)
+        Props.setShowSide(false)
       }
     }
     document.addEventListener('click',handleClickOutside,true)
