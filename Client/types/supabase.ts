@@ -11,21 +11,21 @@ export type Database = {
     Tables: {
       messages: {
         Row: {
-          author: string | null
+          author: string
           body: string | null
           created_at: string | null
           id: string
           room_id: string
         }
         Insert: {
-          author?: string | null
+          author?: string
           body?: string | null
           created_at?: string | null
           id?: string
           room_id: string
         }
         Update: {
-          author?: string | null
+          author?: string
           body?: string | null
           created_at?: string | null
           id?: string
@@ -50,6 +50,7 @@ export type Database = {
       }
       room: {
         Row: {
+          created_at: string | null
           creator: string
           Icon: string | null
           id: string
@@ -57,6 +58,7 @@ export type Database = {
           name: string
         }
         Insert: {
+          created_at?: string | null
           creator: string
           Icon?: string | null
           id?: string
@@ -64,6 +66,7 @@ export type Database = {
           name: string
         }
         Update: {
+          created_at?: string | null
           creator?: string
           Icon?: string | null
           id?: string
@@ -172,7 +175,7 @@ export type Database = {
           room_id_input: string
         }
         Returns: {
-          author: string | null
+          author: string
           body: string | null
           created_at: string | null
           id: string
@@ -182,12 +185,34 @@ export type Database = {
       hello: {
         Args: Record<PropertyKey, never>
         Returns: {
+          created_at: string | null
           creator: string
           Icon: string | null
           id: string
           members: number | null
           name: string
         }[]
+      }
+      insert_message: {
+        Args: {
+          body: string
+          created_at: number
+          room_name: string
+          username: string
+        }
+        Returns: {
+          user_id: string
+          roomname: string
+          messagebody: string
+          message_created_at: string
+          user_name: string
+        }[]
+      }
+      isroomexist: {
+        Args: {
+          room_name: string
+        }
+        Returns: boolean
       }
       join_user_room: {
         Args: {

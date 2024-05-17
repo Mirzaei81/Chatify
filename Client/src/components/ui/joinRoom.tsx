@@ -10,32 +10,53 @@ import {
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button";
-import { FaPlus } from "react-icons/fa6";
 import { useContext, useState } from "react";
 import { motion } from "framer-motion";
 import { useSupabaseMutation } from "supabase-query";
 import { useQueryClient } from "react-query";
 import { Spinner } from "./spinner";
 import { UserCTX } from "@/routes/App";
+import { useTypedSupabaseQuery } from "@/utils/SupaBaseClient";
 import { LeftFadeIn } from "@/utils/variants";
 
-export default function MakeRoom({ sidebarShown }: { sidebarShown: boolean }) {
+export interface IRoomProp {
+  shouldRefetch: React.Dispatch<React.SetStateAction<boolean>>,
+  sidebarShown: Boolean
+}
+
+export default function JoinRoom({ shouldRefetch, sidebarShown }: IRoomProp) {
   const User = useContext(UserCTX)
+  const [ShouldSearch, setShouldSearch] = useState(false)
+  const [err, setErr] = useState("")
   const [RoomName, setRoomname] = useState("")
+
   const queryClient = useQueryClient()
-  const { mutate, isLoading } = useSupabaseMutation({
-    onSuccess: () => queryClient.invalidateQueries("room"),
+  const { mutate, isLoading: JoingTheRoom } = useSupabaseMutation({
+    onSuccess: () => { queryClient.invalidateQueries("room"); shouldRefetch((prev) => { console.log(prev); return true }) },
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = (data: any) => {
     setRoomname("")
     mutate((supabase) =>
-      supabase.from("room").insert([{ name: RoomName, creator: User?.id, members: 1 }])
+      supabase.from("room_user").insert({ room_id: data.id, user_id: User?.id })
     )
+    setShouldSearch(false)
   }
+
+  const { isLoading } = useTypedSupabaseQuery((supabase) =>
+    supabase.from("room").select("id").eq("name", RoomName).single(),
+    {
+      enabled: ShouldSearch,
+      onSuccess: handleSubmit,
+      onError: () => { setShouldSearch(false); setErr("اتاق مورد نظر یافت نشد (شاید اسم رو  اشتباهی نوشتی)"); return false; },
+      retry: 2
+    }
+  )
+
   const handlerEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key == 'Enter') {
-      handleSubmit()
+      console.log(e.key)
+      setShouldSearch(true)
     }
   }
 
@@ -45,19 +66,19 @@ export default function MakeRoom({ sidebarShown }: { sidebarShown: boolean }) {
         <motion.button
           whileHover={{ scale: 1.2 }}
           variants={LeftFadeIn}
-          custom={-1}
           initial={false}
+          custom={1}
           animate={sidebarShown ? "open" : "closed"}
           className="bg-primary w-[6rem] font-sans rounded-lg p-2 flex justify-center" style={{ borderRadius: "8px" }}>
-          <FaPlus className="self-center" size={15} />  ثبت
+          ورود
         </motion.button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md bg-card">
         <DialogHeader>
-          {isLoading ? <Spinner /> : (<div>
+          {(isLoading || JoingTheRoom) ? <Spinner /> : (<div>
             <DialogTitle>یه اتاق نو </DialogTitle>
             <DialogDescription>
-              اسم اتاق جدیدت چی میتونه باشه ؟!!  🧐
+              {isLoading ? <Spinner /> : (err !== "" ? err : <span> اسم اتاقی که میخوای بری توش چیه ؟؟   🤔</span>)}
             </DialogDescription>
           </div>)}
         </DialogHeader>
@@ -65,10 +86,11 @@ export default function MakeRoom({ sidebarShown }: { sidebarShown: boolean }) {
           <Input
             value={RoomName}
             onChange={(e) => setRoomname(e.target.value)}
-            onKeyPress={handlerEnter}
+            onKeyDown={handlerEnter}
             placeholder="اسم اتاق"
           />
-          <Button type="submit" onClick={handleSubmit} size="sm" style={{ borderRadius: 7, marginRight: 5 }} className="px-3 ml-10">
+          <Button type="submit" onClick={() => setShouldSearch(true)}
+            size="sm" style={{ borderRadius: 7, marginRight: 5 }} className="px-3 ml-10">
             <span className="sr-only">Copy</span>
             <FaArrowAltCircleLeft size={16} />
           </Button>

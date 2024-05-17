@@ -1,4 +1,4 @@
-const {nextui} = require("@nextui-org/theme");
+const { nextui } = require("@nextui-org/theme");
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -8,49 +8,43 @@ export default {
   ],
   theme: {
     extend: {
-      fontFamily:{
-       Cheveuxdange:
-        "CheveuxdangeRegular",
-       Pencil:
-        "PencilRegular",
+      spacing: {
+        '128': '32rem',
+        '40': '10rem',
+        '44': '11rem',
+        '48': '12rem',
+        '52': '13rem',
+        '56': '14rem',
+        '60': '15rem',
+        '64': '16rem',
+        '68': '17rem',
+        '72': '18rem',
+        '76': '19rem',
+        '80': '20rem',
+        '84': '21rem',
+        '88': '22rem',
+        '92': '23rem',
+        '96': '24rem',
+        '100': '25rem',
+        '104': '26rem',
+        '108': '27rem',
+        '112': '28rem',
+        '116': '29rem',
+        '120': '30rem',
+        '124': '31rem',
       },
-      colors: {
-        'sunglow': { DEFAULT: '#FECD43', 100: '#402f00', 200: '#805e01', 300: '#c08d01', 400: '#febb03', 500: '#fecd43', 600: '#fed669', 700: '#fee18e', 800: '#ffebb4', 900: '#fff5d9' },
-        'glaucous': { DEFAULT: '#677ABC', 100: '#121728', 200: '#232d51', 300: '#354479', 400: '#475ba2', 500: '#677abc', 600: '#8594c9', 700: '#a4afd7', 800: '#c2c9e4', 900: '#e1e4f2' } 
-      }
+      fontFamily: {
+        Cheveuxdange:
+          "CheveuxdangeRegular",
+        Pencil:
+          "PencilRegular",
+        BZiba: "BZiba",
+        BZiba: ["BZiba", "sans"],
+        Maktoob: ["Maktoob", "sans"],
+        IranNastaliq: ["IranNastaliq", "sans"]
+      },
     },
-    darkMode: "class",
-    plugins: [nextui()],
-  }
+  },
+  darkMode: "class",
+  plugins: [nextui()],
 }
-//{
-//      themes:{
-//        dark:{
-//          colors:{
-//            background:'#FECD43',
-//            foreground: '#677ABC',
-//            primary:{
-//              foreground:"#FFFFFF",
-//              DEFAULT: '#FECD43', 100: '#402f00', 200: '#805e01',
-//              300: '#c08d01', 400: '#febb03', 500: '#fecd43', 600: '#fed669', 
-//              700: '#fee18e', 800: '#ffebb4', 900: '#fff5d9' },
-//            secondary:{
-//              DEFAULT: '#677ABC', 100: '#121728', 200: '#232d51',
-//              300: '#354479', 400: '#475ba2', 500: '#677abc', 600:
-//              '#8594c9', 700: '#a4afd7', 800: '#c2c9e4', 900: '#e1e4f2' } 
-//          },
-//        },
-//      },
-//      mytheme: {
-//          // custom theme
-//          extend: "dark",
-//          colors: {
-//            primary: {
-//              DEFAULT: "#BEF264",
-//              foreground: "#000000",
-//            },
-//            focus: "#BEF264",
-//          },
-//        },
-//    })
-//

@@ -9,162 +9,131 @@ import { UserCTX } from "../App";
 import "./Room.css"
 import { IMessage } from "types/util";
 import useMessageSearch from "@/utils/useMessageSearch";
-import { createMessages } from "@/utils/CreateMessages";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { Variants, InputVariants } from "@/utils/variants";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuShortcut,
+  ContextMenuTrigger,
+} from "@/components/ui/ContextMenu"
+import { FaEdit, FaTrash } from "react-icons/fa";
+import { supabaseClient } from "@/main";
+import EditMessage from "@/components/ui/EditMessage";
 
 export interface IRoom {
   SideBarShown: boolean
 }
-
-
-const Variants = {
-  open: (WindowsWidth: number) => ({
-    width: `${WindowsWidth - Number(import.meta.env.VITE_WIDTH_SIDEBAR)}px`,
-    marginLeft: `${Number(import.meta.env.VITE_WIDTH_SIDEBAR)}px`,
-  }),
-  closed: {
-    width: "100vw",
-    marginLeft: "0",
-    transition: {
-      delay: .6
-    }
-  }
-}
-
-const InputVariants = {
-  open: (WindowsWidth: number) => ({
-    width: `${WindowsWidth - Number(import.meta.env.VITE_WIDTH_SIDEBAR)}px`,
-  }),
-  closed: {
-    width: "100vw",
-    marginLeft: "0",
-    transition: {
-      delay: .6
-    }
-  }
+interface SelectedMessage {
+  body: string, author: string,
+  open: boolean, setOpen: (val: boolean) => void,
+  setChange: (val: string, idx: number) => void, idx: number
 }
 //Public API that will echo messages sent to it back to the client
 let wsURL = "ws://127.0.0.1:8000/ws/chat/"
+
 export default function Room(props: IRoom) {
   const [val, setVal] = useState("")
   const [roomName, setRoomname] = useState("")
   const [pageNumber, setPageNumber] = useState(1)
-  const { isLoading, err, messages, hasMore } = useMessageSearch(roomName, pageNumber)
-
+  const { messages, hasMore } = useMessageSearch(roomName, pageNumber)
+  const [loading, setLoading] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [body, setBody] = useState("")
+  const [author, setAuthor] = useState("")
+  const [idx, setIdx] = useState(-1)
 
   const User = useContext(UserCTX)
   const dimention = useWindowDimensions()
   const RoomParam = useParams()
 
-  const MessageCol = useRef<HTMLUListElement>(null)
-  const TopElement = useRef<HTMLLIElement>(null)
-  const observer = useRef<IntersectionObserver>()
-
-  const loadMessage = useCallback((e: HTMLLIElement) => {
-    if (isLoading) return
-//    if (observer.current) observer.current.disconnect()
-//    observer.current = new IntersectionObserver(entries => {
-//      if (entries[0].isIntersecting ) {
-//        console.log("has More")
-//      }
-//    })
-//    if (e) observer.current.observe(e)
-  }, [])
-
   const [socketUrl, setSocketUrl] = useState(wsURL);
   const [messageHistory, setMessageHistory] = useState<IMessage[]>([]);
 
-
   const InputRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     const room = (RoomParam.RoomName) ? RoomParam.RoomName : "لابی"
-    setRoomname(room!.replace(" ", ""))
-    document.title = room!
+    setRoomname(room!)
+    document.title = room!.replace(" ", "")
     setSocketUrl(wsURL + room + "/")
     if (messages) {
       setMessageHistory((prev) => prev.concat(messages))
     }
   }, [RoomParam])
+  let user_name: string | null = User?.user_metadata.name ? User?.user_metadata.name : User?.user_metadata.user_name
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(
     socketUrl, {
-    onOpen: () => { toast.success("Connected", { icon: "🔥" }) },
+    onOpen: () => { toast.success("Connected", { icon: "🔥" }), setLoading(true) },
     onError: () => { toast.error("Failed!", { icon: "😕" }) },
     queryParams: {
       room_name: roomName,
-      user_name: User ? User!.user_metadata.name : ""
+      user_name: user_name!
     }
-  }, (User !== null && roomName !== ""));
+  }, (user_name !== undefined && user_name !== "" && roomName !== ""));
 
-  const focusInput = () => {
-    if (InputRef.current) {
-      InputRef.current.focus();
-    }
-  };
 
   const connectionStatus = {
-    [ReadyState.CONNECTING]: "Connecting",
-    [ReadyState.OPEN]: "Open",
-    [ReadyState.CLOSING]: "Closing",
-    [ReadyState.CLOSED]: "Closed",
-    [ReadyState.UNINSTANTIATED]: "Uninstantiated",
+    [ReadyState.CONNECTING]: "در حال تاال 🔄",
+    [ReadyState.OPEN]: " متصل شدی ✓",
+    [ReadyState.CLOSING]: "",
+    [ReadyState.CLOSED]: "بسته است ❌",
+    [ReadyState.UNINSTANTIATED]: " درحتل انصال □",
   }[readyState];
- const focouseBottomElement = () =>{
-   if(MessageCol.current){
-   MessageCol.current.scroll({
-    top:MessageCol.current.scrollHeight,
-    behavior:"smooth",
-    left:0
-   })
-   console.log(MessageCol.current.scrollHeight)
-   }
- }
+
   useEffect(() => {
-    focusInput();
     if (lastMessage !== null) {
       const message = JSON.parse(lastMessage.data)
       if (message.type == "Notice") {
-        const user = message.message.replace("%20", " ")
-        if (user === User?.user_metadata.full_name) {
+        const user = message.message.replaceAll("%20", " ")
+        if (user.trim() === user_name?.trim()) {
           toast(() => (
             <span className="w-full text-black" dir="rtl">
-              خوش آمدی {message.message.replace("%20", " ")} 👋👋
+              خوش آمدی {user} 👋👋
             </span>
           ), { position: "top-center" })
         }
         else {
           toast(() => (
             <span className="w-full text-black" dir="rtl">
-              {message.message.replace("%20", " ")} به اتاق پیوست ! 👋
+              {user} به اتاق پیوست ! 👋
             </span>
           ), { position: "top-center" })
         }
       }
+      else if (message.type == 'init') {
+        setMessageHistory(message.data)
+        setLoading(false)
+      }
       else if (message.type == "message") {
-        const Msg: IMessage ={ author: message!.author, message_body: message!.message,
-          url: message.url, created_at: Date.now().toString() }
-        setMessageHistory((prev) => prev.concat(Msg));
+        const Msg: IMessage = {
+          author: message!.author, message_body: message!.message_body,
+          url: message.url, created_at: Date.now().toString()
+        }
+        if (Msg.author !== user_name) {
+          setMessageHistory((prev) => [Msg].concat(prev));
+        }
       }
     }
-        focouseBottomElement()
   }, [lastMessage]);
-  //testing the Messages mocking
-  useEffect(() => {
-    setMessageHistory([])
-    if (messageHistory.length === 0) {
-      const messages = createMessages(100)
-      setMessageHistory(messages);
-    }
 
-    if(MessageCol) MessageCol.current?.scrollIntoView({
-      block:"end",
-      behavior:"auto"
 
-    })
-    focouseBottomElement()
-   console.log(MessageCol.current?.scrollHeight)
-  }, [MessageCol])
+  const changeOpen = (val: boolean) => {
+    console.log(val)
+    setDialogOpen(false)
+  }
+
+  const changeMessage = (newBody: string) => {
+    console.log(newBody)
+    let msgCopy = messageHistory.slice()
+    msgCopy[idx].message_body = newBody
+    setMessageHistory(msgCopy)
+  }
+
 
   const handleInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key == "Enter") {
@@ -173,91 +142,125 @@ export default function Room(props: IRoom) {
       }
     }
   }
+  const removeMessage = (idx: number, body: string) => {
+    let historyCopy = [...messageHistory]
+    historyCopy.splice(idx, 1)
+    setMessageHistory(historyCopy)
+    supabaseClient.from("messages").delete().eq("body", body)
+  }
   const handleClickSendMessage = useCallback(() => {
-    console.log(User?.user_metadata)
     if (val !== "") {
+      const CurrentMessage: IMessage = {
+        'author': user_name!,
+        'message_body': val,
+        'url': User?.user_metadata.avatar_url ? User?.user_metadata.avatar_url : "",
+        created_at: Date.now().toString()
+      }
+      setMessageHistory((prev) => [CurrentMessage].concat(prev))
       sendMessage(
-        JSON.stringify({
-          'user_id': User?.user_metadata.name,
-          'message': val,
-          'url': User?.user_metadata.avatar_url
-        })
+        JSON.stringify(CurrentMessage)
       )
       setVal("")
     }
   }, [val]);
 
-  const ChatHeight = dimention.height - InputRef.current?.offsetHeight! - Number(import.meta.env.VITE_HEIGHT_MAINNAV)
+  const setSelectMessage = (body: string, author: string, index: number) => {
+    setDialogOpen(true)
+    setBody(body)
+    setIdx(index)
+    setAuthor(author)
+  }
 
+  const ChatHeight = dimention.height - InputRef.current?.offsetHeight! - Number(import.meta.env.VITE_HEIGHT_MAINNAV) - 10
   return (
-    <div className="flex w-screen  bg-zinc-950 h-full flex-col" style={{ overflow: "hidden", height: ChatHeight?ChatHeight:"100vh" }}>
-      <div className="bg-grey-200 grow overflow-y-auto overflow-x-hidden  rounded">
-        <motion.div
-          animate={props.SideBarShown ? "open" : "closed"}
-          custom={dimention}
-          variants={Variants}
-          initial={false}
-          className="m-2 p-2 h-full  rounded bg-night-600">
-          <div
-            id="scrollableDiv"
+    <motion.div className="flex font-Maktoob w-screen  bg-zinc-950 h-full flex-col"
+      animate={props.SideBarShown ? "open" : "closed"}
+      custom={dimention.width}
+      variants={Variants}
+      initial={false}
+      style={{ height: ChatHeight ? ChatHeight : "100vh" }}>
+      <EditMessage author={author} body={body} open={dialogOpen}
+        setOpen={setDialogOpen} setChange={changeMessage} />
+      {loading ? <Spinner className="h-full" size="large" /> :
+        <div className="m-2 p-2 h-full ">
+          <div id="scrollableDiv"
             style={{
               overflow: 'auto',
               display: 'flex',
               flexDirection: 'column-reverse',
+              height: `${ChatHeight}px`
             }}
           >
-            {/*Put the scroll bar always on the bottom*/}
             <InfiniteScroll
               dataLength={length}
-              next={()=>setPageNumber(pageNumber+1)}
-              style={{ display: 'flex', flexDirection: 'column-reverse' }} //To put endMessage and loader to the top.
-              inverse={true} //
-              hasMore={true}
+              next={() => setPageNumber(pageNumber + 1)}
+              style={{ display: 'flex', flexDirection: 'column-reverse', whiteSpace: "pre" }} //To put endMessage and loader to the top.
+              inverse={true}
+              hasMore={hasMore}
               loader={<h4>Loading...</h4>}
               scrollableTarget="scrollableDiv"
             >
               {messageHistory.map((msg, index) => (
-                <li key={index} className="m-2 flex flex-row  items-center"> <Avatar className="" >
+                <li key={index} className={`m-2 flex ${msg.author === user_name ? "flex-row-reverse content-end" : "flex-row"}  items-center`}>
+                  <Avatar className="" >
                     <AvatarImage className="block w-8 h-8 " style={{ borderRadius: "50%", objectFit: "scale-down" }} src={msg.url!} />
                     <AvatarFallback style={{ borderRadius: "50%" }}
                       className="bg-muted p-2 text-primary">{msg.author[0].toUpperCase()}{msg.author[1]}</AvatarFallback>
                   </Avatar>
-                  <div id="Messages" className="bg-sky-950 text-card-foreground m-2
-            rounded w-fit p-2">{msg.message_body!} TopElement
-                  </div>
+                  <ContextMenu>
+                    <ContextMenuTrigger>
+                      <pre id="Messages" className="bg-sky-950 text-card-foreground m-2 rounded w-fit p-2">
+                        {msg.message_body}
+                      </pre>
+                    </ContextMenuTrigger>
+                    <ContextMenuContent className="w-64">
+                      <ContextMenuItem onClick={() => removeMessage(index, msg.message_body)}
+                        inset disabled={msg.author === user_name ? false : true}>
+                        Remove
+                        <ContextMenuShortcut><FaTrash /></ContextMenuShortcut>
+                      </ContextMenuItem>
+                      <ContextMenuItem onClick={() => setSelectMessage(msg.message_body, msg.author, index)}
+                        inset disabled={msg.author === user_name ? false : true}>
+                        Edit
+                        <ContextMenuShortcut><FaEdit /></ContextMenuShortcut>
+                      </ContextMenuItem>
+                    </ContextMenuContent>
+                  </ContextMenu>
                 </li>
               ))}
             </InfiniteScroll>
           </div>
-        </motion.div>
-      </div>
+        </div>}
       <motion.div
+        ref={InputRef}
         animate={props.SideBarShown ? "open" : "closed"}
         custom={dimention.width}
-        variants={Variants}
+        variants={InputVariants}
         initial={false}
-        ref={InputRef}
-        className="bottom-0 bg-card absolute h-1/7 ">
-        <motion.div
-          animate={props.SideBarShown ? "open" : "closed"}
-          custom={dimention.width}
-          initial={false}
-          variants={InputVariants}
+        className="bottom-0 w-full absolute h-1/7 ">
+        <div
           className="flex items-center content-center h-28" >
           <input
-            className="grow px-2 mx-2 h-16 rounded-lg"
-            placeholder={`Send Message to ${connectionStatus}`}
+            dir="rtl"
+            className="grow px-2 mx-2 font-BZiba h-16 rounded-lg text-black"
+            placeholder={`پیغامتو بفرست    ${connectionStatus}`}
             value={val} onKeyDown={handleInput} onChange={e => setVal(e.target.value)} />
           <button
-            className="border-white  hover:border-2 mr-10  p-2 w-14 h-14 flex items-center justify-center"
+            className="border-white bg-zinc-950 hover:border-2 mr-10  p-2 w-14 h-14 flex items-center justify-center"
             style={{ borderRadius: "50%" }}
             onClick={handleClickSendMessage}
             disabled={readyState !== ReadyState.OPEN}
           >
-            <IoArrowForward className="" />
+            <IoArrowForward />
           </button>
-        </motion.div>
+        </div>
       </motion.div>
-    </div>
+    </motion.div>
   );
 }
+
+
+
+
+
+
