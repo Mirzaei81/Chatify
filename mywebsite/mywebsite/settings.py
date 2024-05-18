@@ -19,7 +19,6 @@ class Base(Configuration):
     # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
     ASGI_APPLICATION = "mywebsite.asgi.application"
 
-    ALLOWED_HOSTS = []
 
     # Application definition
     INSTALLED_APPS = [
@@ -121,6 +120,7 @@ class Prod(Base):
     secretFile = open("/etc/secrets/secrets.txt")
     SECRET_KEY = secretFile.read()
     DEBUG = False
+    ALLOWED_HOSTS = ["*"]
     CACHES = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
@@ -142,6 +142,7 @@ class Prod(Base):
 class Dev(Base):
     SECRET_KEY = 'django-insecure-yq5=fe*#2@l5r*!gb-7fa@-=&#$xw3u56ttpxhn4lwda34dxmf'
     DEBUG = True
+    ALLOWED_HOSTS = []
     CACHES = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
