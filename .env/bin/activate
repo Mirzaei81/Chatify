@@ -63,6 +63,8 @@ fi
 
 export SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1YXJwamVlcnB0ZmRzZHR0b3FvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcxMDM5OTc1MiwiZXhwIjoyMDI1OTc1NzUyfQ.RE8aa8L9KtgOJy0rtzQX7ImCY2M1d2Otf7qhGixroKM"
 export SUPABASE_URL="http://wuarpjeerptfdsdttoqo.supabase.co"
+export DJANGO_CONFIGURATION=Dev
+export DJANGO_SETTINGS_MODULE=mywebsite.settings
 
 # This should detect bash and zsh, which have a hash command that must
 # be called to get it to forget past commands.  Without forgetting
