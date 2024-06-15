@@ -20,6 +20,6 @@ def main():
 
 
 if __name__ == '__main__':
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mywebsite.settings')
-    os.environ.setdefault('DJANGO_CONFIGURATION', 'Dev')
+    from dotenv import load_dotenv,find_dotenv
+    load_dotenv(find_dotenv())
     main()

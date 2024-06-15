@@ -13,8 +13,6 @@ from configurations import Configuration
 from pathlib import Path
 
 from configurations.base import os
-from dotenv import load_dotenv,find_dotenv
-load_dotenv(find_dotenv())
 
 class Base(Configuration):
     BASE_DIR = Path(__file__).resolve().parent.parent
@@ -121,8 +119,8 @@ class Base(Configuration):
 
 class Prod(Base):
     SECRET_KEY = os.environ["SECRET_KEY"]
-    DEBUG = False
     ALLOWED_HOSTS = ["*"]
+    DEBUG = False
     CACHES = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
