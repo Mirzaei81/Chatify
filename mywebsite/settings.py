@@ -16,7 +16,6 @@ from configurations.base import os
 
 class Base(Configuration):
     BASE_DIR = Path(__file__).resolve().parent.parent
-
     # Quick-start development settings - unsuitable for production
     # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
     ASGI_APPLICATION = "mywebsite.asgi.application"
@@ -119,6 +118,7 @@ class Base(Configuration):
 
 class Prod(Base):
     SECRET_KEY = os.environ["SECRET_KEY"]
+    BASE_DIR = Path(__file__).resolve().parent.parent
     ALLOWED_HOSTS = ["*"]
     DEBUG = False
     CACHES = {
