@@ -10,10 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 from configurations import Configuration,values
-from pathlib import Path
+import os.path
 
-from configurations.base import os
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 class Base(Configuration):
     # Quick-start development settings - unsuitable for production
     # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -63,18 +62,6 @@ class Base(Configuration):
 
     #WSGI_APPLICATION = 'mywebsite.wsgi.application'devi
 
-
-    # Database
-    # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-
-
     # Password validation
     # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -109,7 +96,7 @@ class Base(Configuration):
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/5.0/howto/static-files/
     STATIC_URL = 'static/'
-    STATIC_ROOT = BASE_DIR/'static'
+    STATIC_ROOT = BASE_DIR+'/static'
     # Default primary key field type
     # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
