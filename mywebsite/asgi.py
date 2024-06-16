@@ -8,7 +8,9 @@ https://docs.djangoproject.com/en/5.0/howto/deployment/asgi/
 """
 
 from channels.routing import ProtocolTypeRouter, URLRouter
-
+import os 
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mywebsite.settings')
+os.environ.setdefault('DJANGO_CONFIGURATION', 'Prod')
 from configurations.asgi import get_asgi_application
 from channels.security.websocket import AllowedHostsOriginValidator
 from channels.auth import AuthMiddlewareStack

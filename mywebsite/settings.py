@@ -13,9 +13,8 @@ from configurations import Configuration
 from pathlib import Path
 
 from configurations.base import os
-
+BASE_DIR = Path(__name__).resolve().parent.parent
 class Base(Configuration):
-    BASE_DIR = Path(__file__).resolve().parent.parent
     # Quick-start development settings - unsuitable for production
     # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
     ASGI_APPLICATION = "mywebsite.asgi.application"
@@ -25,6 +24,7 @@ class Base(Configuration):
         'chat',
         'django.contrib.auth',
         'django.contrib.admin',
+        'django.contrib.admindocs',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.messages',
@@ -118,8 +118,9 @@ class Base(Configuration):
 
 class Prod(Base):
     SECRET_KEY = os.environ["SECRET_KEY"]
-    BASE_DIR = Path(__file__).resolve().parent.parent
     ALLOWED_HOSTS = ["*"]
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+    STATIC_URL = 'static/'
     DEBUG = False
     CACHES = {
         "default": {

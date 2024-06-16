@@ -15,6 +15,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.room_name_latin = ""
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+        print(self.scope["query_string"])
         params=  parser(self.scope["query_string"].decode("ascii"))
         for c in self.room_name:
             if c in fa_to_lat:
