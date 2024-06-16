@@ -9,11 +9,11 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-from configurations import Configuration
+from configurations import Configuration,values
 from pathlib import Path
 
 from configurations.base import os
-BASE_DIR = Path(__name__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 class Base(Configuration):
     # Quick-start development settings - unsuitable for production
     # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -110,22 +110,23 @@ class Base(Configuration):
     # https://docs.djangoproject.com/en/5.0/howto/static-files/
     STATIC_URL = 'static/'
     STATIC_ROOT = BASE_DIR/'static'
-
     # Default primary key field type
     # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
     DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 class Prod(Base):
-    SECRET_KEY = os.environ["SECRET_KEY"]
-    ALLOWED_HOSTS = ["*"]
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+    DOTENV = os.path.join(BASE_DIR, '.env')
+    SUPABASE_URL = values.Value()
+    SUPABASE_KEY = values.Value()
+    SECRET_KEY = values.SecretValue()
+    DEBUG =values.BooleanValue(False)
+    ALLOWED_HOSTS = values.ListValue()
     STATIC_URL = 'static/'
-    DEBUG = False
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
     CACHES = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": os.environ["REDIS_URL"] ,
+            "LOCATION": values.Value(environ_name="REDIS_URL") ,
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
             }
@@ -136,13 +137,12 @@ class Prod(Base):
             "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {
                 "hosts": [
-                    os.environ["REDIS_URL"] ,
+                    values.Value(environ_name="REDIS_URL") ,
                 ],
             },
         },
     }
-
-class Dev(Base):
+class Dev(Configuration):
     SECRET_KEY = 'django-insecure-yq5=fe*#2@l5r*!gb-7fa@-=&#$xw3u56ttpxhn4lwda34dxmf'
     DEBUG = True
     ALLOWED_HOSTS = []

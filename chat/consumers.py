@@ -1,16 +1,15 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from channels.layers import asyncio
+from django.conf import settings
 from .fa_to_lat import fa_to_lat
 from .parser import parser
 from .models import sb, supabase
 import json
 from time import time
-import os 
 
-SUPABASE_URL = os.environ["SUPABASE_URL"]
-SUPABASE_KEY = os.environ["SUPABASE_KEY"]
+SUPABASE_URL = settings.SUPABASE_URL
+SUPABASE_KEY = settings.SUPABASE_KEY
 SupaBase = supabase(SUPABASE_URL,SUPABASE_KEY)
-
+print(SUPABASE_KEY,SUPABASE_URL,settings.ALLOWED_HOSTS,settings.DEBUG)
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.room_name_latin = ""
