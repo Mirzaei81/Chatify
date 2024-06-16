@@ -2,13 +2,13 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.conf import settings
 from .fa_to_lat import fa_to_lat
 from .parser import parser
-from .models import sb, supabase
+from .models import supabase
 import json
 from time import time
 
 SUPABASE_URL = settings.SUPABASE_URL
 SUPABASE_KEY = settings.SUPABASE_KEY
-SupaBase = supabase(SUPABASE_URL,SUPABASE_KEY)
+sb = supabase(SUPABASE_URL,SUPABASE_KEY)
 print(SUPABASE_KEY,SUPABASE_URL,settings.ALLOWED_HOSTS,settings.DEBUG)
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
@@ -29,7 +29,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 "type":"chat.notice",
                 "message":params['user_name']
             })
-        message = await SupaBase.get_message(roomName=self.room_name)
+        message = await sb.get_message(roomName=self.room_name)
         await self.channel_layer.group_send(self.room_group_name,{
             "type":"chat.init",
             "message":message

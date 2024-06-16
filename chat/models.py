@@ -1,9 +1,5 @@
-import os
 import aiohttp
 from django.core.cache import cache
-
-SUPABASE_URL = os.environ["SUPABASE_URL"]
-SUPABASE_KEY = os.environ["SUPABASE_KEY"]
 
 class supabase:
     header={}
@@ -11,8 +7,8 @@ class supabase:
         self.url = url
         self.key = key
         self.header = {
-            "Authorization": f"Bearer {SUPABASE_KEY}",
-            "apikey":f"{SUPABASE_KEY}",
+            "Authorization": f"Bearer {key}",
+            "apikey":f"{url}",
             "Content-Type": "application/json"
             }
 
@@ -34,6 +30,5 @@ class supabase:
             data= { 'body': txt, "created_at": created, "room_name":room_name,"username":username }
             async with session.post('https://wuarpjeerptfdsdttoqo.supabase.co/rest/v1/rpc/insert_message',headers=self.header,json=data) as resp :
                 return resp
-sb = supabase(SUPABASE_URL,SUPABASE_KEY)
 
 
