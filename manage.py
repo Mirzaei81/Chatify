@@ -7,9 +7,8 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mywebsite.settings')
     try:
-        from configurations.management import execute_from_command_line
+        from django  import execute_from_command_line
     except ImportError as exc:
         raise ImportError(
             "Couldn't import Django. Are you sure it's installed and "
@@ -20,6 +19,6 @@ def main():
 
 
 if __name__ == '__main__':
-    from dotenv import load_dotenv,find_dotenv
-    load_dotenv(find_dotenv())
+    from dotenv import load_dotenv
+    load_dotenv()
     main()

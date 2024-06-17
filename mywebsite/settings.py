@@ -9,145 +9,120 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-from configurations import Configuration,values
 import os.path
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-class Base(Configuration):
-    # Quick-start development settings - unsuitable for production
-    # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-    ASGI_APPLICATION = "mywebsite.asgi.application"
-    # Application definition
-    INSTALLED_APPS = [
-        'daphne',
-        'chat',
-        'django.contrib.auth',
-        'django.contrib.admin',
-        'django.contrib.admindocs',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
-    ]
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
+ASGI_APPLICATION = "mywebsite.asgi.application"
+# Application definition
+INSTALLED_APPS = [
+    'daphne',
+    'chat',
+    'django.contrib.auth',
+    'django.contrib.admin',
+    'django.contrib.admindocs',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+]
 
 
-    MIDDLEWARE = [
-        'django.middleware.security.SecurityMiddleware',
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    ]
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
 
-    ROOT_URLCONF = 'mywebsite.urls'
+ROOT_URLCONF = 'mywebsite.urls'
 
 
-    TEMPLATES = [
-        {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [],
-            'APP_DIRS': True,
-            'OPTIONS': {
-                'context_processors': [
-                    'django.template.context_processors.debug',
-                    'django.template.context_processors.request',
-                    'django.contrib.auth.context_processors.auth',
-                    'django.contrib.messages.context_processors.messages',
-                ],
-            },
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
         },
-    ]
-
-    #WSGI_APPLICATION = 'mywebsite.wsgi.application'devi
-
-    # Password validation
-    # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
-
-    AUTH_PASSWORD_VALIDATORS = [
-    {
-    'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
-    {
-    'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-    'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-    'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-    ]
+]
+
+#WSGI_APPLICATION = 'mywebsite.wsgi.application'devi
+
+# Password validation
+# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+{
+'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+},
+{
+'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+},
+{
+'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+},
+{
+'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+},
+]
 
 
-    # Internationalization
-    # https://docs.djangoproject.com/en/5.0/topics/i18n/
+# Internationalization
+# https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-    LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-us'
 
-    TIME_ZONE = 'UTC'
+TIME_ZONE = 'UTC'
 
-    USE_I18N = True
+USE_I18N = True
 
-    USE_TZ = True
+USE_TZ = True
 
 
-    # Static files (CSS, JavaScript, Images)
-    # https://docs.djangoproject.com/en/5.0/howto/static-files/
-    STATIC_URL = 'static/'
-    STATIC_ROOT = BASE_DIR+'/static'
-    # Default primary key field type
-    # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.0/howto/static-files/
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR+'/static'
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
-    DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-class Prod(Base):
-    DOTENV = os.path.join(BASE_DIR, '.env')
-    SUPABASE_URL = values.Value()
-    SUPABASE_KEY = values.Value()
-    SECRET_KEY = values.SecretValue()
-    DEBUG =values.BooleanValue(False)
-    ALLOWED_HOSTS = values.ListValue()
-    STATIC_URL = 'static/'
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-    CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": values.Value(environ_name="REDIS_URL") ,
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            }
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY")
+DEBUG =os.environ.get("DEBUG")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS")
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.environ.get("REDIS_URL"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [
-                    values.Value(environ_name="REDIS_URL") ,
-                ],
-            },
+}
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                os.environ.get("REDIS_URL") ,
+            ],
         },
-    }
-class Dev(Configuration):
-    SECRET_KEY = 'django-insecure-yq5=fe*#2@l5r*!gb-7fa@-=&#$xw3u56ttpxhn4lwda34dxmf'
-    DEBUG = True
-    ALLOWED_HOSTS = []
-    CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": "redis://127.0.0.1:6379/1",
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            }
-        }
-    }
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [("127.0.0.1", 6379)],
-            },
-        },
-    }
+    },
+}
 
